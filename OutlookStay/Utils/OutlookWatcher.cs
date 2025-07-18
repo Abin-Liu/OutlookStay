@@ -6,23 +6,23 @@ namespace OutlookStay
 {
 	class OutlookWatcher
 	{
-		public ConfigHandler Config { get; set; }
-		public Point Location => m_location;
-
+		public IntPtr Outlook => m_outlook;
 		IntPtr m_outlook = IntPtr.Zero;
-		Point m_location = Point.Empty;
 
-		public bool Check()
+		public Rectangle GetButtonRect()
 		{
 			var outlook = FindOutlook();
-			var location = GetButtonLocation(outlook);
-			if (location == m_location)
+			return GetButtonRect(outlook);
+		}	
+		
+		public void Activate()
+		{
+			if (m_outlook == IntPtr.Zero)
 			{
-				return false;
+				return;
 			}
 
-			m_location = location;
-			return true;
+			Window.SetForegroundWindow(m_outlook);
 		}
 
 		public void Minimize()
@@ -33,14 +33,8 @@ namespace OutlookStay
 			}
 
 			Window.ShowWindow(m_outlook, Window.SW_MINIMIZE);
-			Clear();
-		}
-
-		public void Clear()
-		{
 			m_outlook = IntPtr.Zero;
-			m_location = Point.Empty;
-		}
+		}		
 
 		IntPtr FindOutlook()
 		{
@@ -49,7 +43,7 @@ namespace OutlookStay
 				return m_outlook;
 			}
 
-			var outlook = Window.FindWindow("rctrl_renwnd32", null);
+			var outlook = Window.FindWindow(Constants.OutlookClass, null);
 			if (!IsActiveWindow(outlook))
 			{
 				outlook = IntPtr.Zero;
@@ -71,7 +65,7 @@ namespace OutlookStay
 				return false;
 			}
 
-			if (handle != Window.GetForegroundWindow())
+			if (!Constants.DevTest && handle != Window.GetForegroundWindow())
 			{
 				return false;
 			}
@@ -79,23 +73,25 @@ namespace OutlookStay
 			return true;
 		}
 
-		Point GetButtonLocation(IntPtr outlook)
+		Rectangle GetButtonRect(IntPtr outlook)
 		{
 			if (outlook == IntPtr.Zero)
 			{
-				return Point.Empty;
+				return Rectangle.Empty;
 			}
 
 			// 目前版本的outlook使用GetWindowRect无法正确获得宽度
 			//var windowRect = Window.GetWindowRect(outlook);
 			var clientRect = Window.GetClientRect(outlook);
 
-			var location = new Point(clientRect.Width - Config.ButtonWidth);
-			location.Offset(Config.XOffset, Config.YOffset);
+			var buttonSize = Window.IsMaximized(outlook) ? Constants.MaximzedButtonSize : Constants.NormalButtonSize;
 
-			var w2s = Window.WindowToScreen(m_outlook);
-			location.Offset(w2s);
-			return location;
+			var location = new Point(clientRect.Width - buttonSize.Width, 0);
+			location.Offset(Constants.ButtonOffset);
+
+			var screenOffset = Window.WindowToScreen(m_outlook);
+			location.Offset(screenOffset);
+			return new Rectangle(location, buttonSize);
 		}
 	}
 }
