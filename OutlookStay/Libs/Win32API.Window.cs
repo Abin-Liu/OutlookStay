@@ -225,6 +225,25 @@ namespace Win32API
 		[DllImport("user32.dll")]
 		public static extern bool ShowWindow(IntPtr hwnd, int nCmdShow);
 
+		[DllImport("user32.dll")]
+		static extern bool GetWindowModuleFileName(IntPtr hWnd, StringBuilder text, int nMaxCount);
+
+		/// <summary>
+		/// Retrieve module file path a window
+		/// </summary>
+		/// <param name="hWnd">Handle of the window</param>
+		/// <returns>Return module file path if the handle is valid, null otherwise</returns>
+		public static string GetWindowModuleFileName(IntPtr hWnd)
+		{
+			StringBuilder sb = new StringBuilder(1000);
+			if (!GetWindowModuleFileName(hWnd, sb, sb.Capacity))
+			{
+				return null;
+			}
+
+			return sb.ToString();
+		}
+
 		/// <summary>
 		/// The window will be hidden
 		/// </summary>

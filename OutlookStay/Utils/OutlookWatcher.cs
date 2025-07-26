@@ -6,92 +6,81 @@ namespace OutlookStay
 {
 	class OutlookWatcher
 	{
-		public IntPtr Outlook => m_outlook;
-		IntPtr m_outlook = IntPtr.Zero;
+		IntPtr m_hwnd = IntPtr.Zero;
 
 		public Rectangle GetButtonRect()
 		{
-			var outlook = FindOutlook();
-			return GetButtonRect(outlook);
-		}	
-		
-		public void Activate()
-		{
-			if (m_outlook == IntPtr.Zero)
-			{
-				return;
-			}
+			var hwnd = FindOutlook();
+			m_hwnd = hwnd;
 
-			Window.SetForegroundWindow(m_outlook);
-		}
-
-		public void Minimize()
-		{
-			if (m_outlook == IntPtr.Zero)
-			{
-				return;
-			}
-
-			Window.ShowWindow(m_outlook, Window.SW_MINIMIZE);
-			m_outlook = IntPtr.Zero;
-		}		
-
-		IntPtr FindOutlook()
-		{
-			if (m_outlook != IntPtr.Zero && Window.IsWindow(m_outlook))
-			{
-				return m_outlook;
-			}
-
-			var outlook = Window.FindWindow(Constants.OutlookClass, null);
-			if (!IsActiveWindow(outlook))
-			{
-				outlook = IntPtr.Zero;
-			}
-
-			m_outlook = outlook;
-			return outlook;
-		}
-
-		bool IsActiveWindow(IntPtr handle)
-		{
-			if (handle == IntPtr.Zero)
-			{
-				return false;
-			}
-
-			if (!Window.IsWindowVisible(handle) || Window.IsMinimized(handle))
-			{
-				return false;
-			}
-
-			if (!Constants.DevTest && handle != Window.GetForegroundWindow())
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		Rectangle GetButtonRect(IntPtr outlook)
-		{
-			if (outlook == IntPtr.Zero)
+			if (hwnd == IntPtr.Zero)
 			{
 				return Rectangle.Empty;
 			}
 
 			// 目前版本的outlook使用GetWindowRect无法正确获得宽度
 			//var windowRect = Window.GetWindowRect(outlook);
-			var clientRect = Window.GetClientRect(outlook);
+			var clientRect = Window.GetClientRect(hwnd);
 
-			var buttonSize = Window.IsMaximized(outlook) ? Constants.MaximzedButtonSize : Constants.NormalButtonSize;
+			var buttonSize = Window.IsMaximized(hwnd) ? Constants.MaximzedSize : Constants.NormalSize;
 
 			var location = new Point(clientRect.Width - buttonSize.Width, 0);
 			location.Offset(Constants.ButtonOffset);
 
-			var screenOffset = Window.WindowToScreen(m_outlook);
+			var screenOffset = Window.WindowToScreen(hwnd);
 			location.Offset(screenOffset);
 			return new Rectangle(location, buttonSize);
+		}
+
+		public void Activate()
+		{
+			if (m_hwnd == IntPtr.Zero)
+			{
+				return;
+			}
+
+			Window.SetForegroundWindow(m_hwnd);
+		}
+
+		public void Minimize()
+		{
+			if (m_hwnd == IntPtr.Zero)
+			{
+				return;
+			}
+
+			Window.ShowWindow(m_hwnd, Window.SW_MINIMIZE);
+			m_hwnd = IntPtr.Zero;
+		}
+
+		IntPtr FindOutlook()
+		{
+			var hwnd = Window.FindWindow(Constants.OutlookClass, null);
+			if (!IsActiveWindow(hwnd))
+			{
+				hwnd = IntPtr.Zero;
+			}
+			return hwnd;
+		}
+
+		static bool IsActiveWindow(IntPtr hwnd)
+		{
+			if (hwnd == IntPtr.Zero)
+			{
+				return false;
+			}			
+
+			//if (Window.IsMinimized(hwnd))
+			//{
+			//	return false;
+			//}
+
+			if (hwnd != Window.GetForegroundWindow())
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

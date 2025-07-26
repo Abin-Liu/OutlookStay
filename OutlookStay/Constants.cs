@@ -7,11 +7,9 @@ namespace OutlookStay
 	internal class Constants
 	{
 		public static readonly string OutlookClass = AppConfig.ReadAppSettings("OutlookClass");
-		public static readonly Size NormalButtonSize = ReadSize("NormalButtonSize");
-		public static readonly Size MaximzedButtonSize = ReadSize("MaximzedButtonSize");
-		public static readonly Point ButtonOffset = ReadPoint("ButtonOffset");
-		public static readonly bool AutoRun = AppConfig.ReadAppSettings("AutoRun", true);
-		public static readonly bool DevTest = false;
+		public static readonly Size NormalSize = ReadSize("NormalSize");
+		public static readonly Size MaximzedSize = ReadSize("MaximzedSize");
+		public static readonly Point ButtonOffset = ReadPoint("Offset");
 
 		static int ConvertInt(object value)
 		{
