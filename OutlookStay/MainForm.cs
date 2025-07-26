@@ -28,7 +28,6 @@ namespace OutlookStay
 
 			Visible = false;
 			ShowInTaskbar = false;
-			m_button.StartWatcher();
 
 			BeginInvoke(new Action(() => {
 				Hide();				

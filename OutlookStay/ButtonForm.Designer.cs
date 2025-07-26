@@ -62,8 +62,7 @@
 			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
 			this.Text = "ButtonForm";
 			this.TopMost = true;
-			this.Load += new System.EventHandler(this.ButtonForm_Load);
-			this.Click += new System.EventHandler(this.ButtonForm_Click);
+			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ButtonForm_MouseDown);
 			this.MouseEnter += new System.EventHandler(this.ButtonForm_MouseEnter);
 			this.MouseLeave += new System.EventHandler(this.ButtonForm_MouseLeave);
 			this.ResumeLayout(false);
